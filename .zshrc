@@ -16,6 +16,8 @@ export ZSH="$HOME/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME=""
+# Powerlevel10k "instant prompt" uyarısını (fastfetch nedeniyle) gizle
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -138,7 +140,7 @@ export EDITOR="nvim"
 export VISUAL="nvim"
 
 # Akış kontrolünü (Ctrl+S/Ctrl+Q) devre dışı bırakır
-stty -ixon
+if [[ $- == *i* ]]; then stty -ixon; fi
 
 # --- PATH Yönetimi ---
 # ZSH -> 'add_to_path' fonksiyonları yerine Zsh'in
