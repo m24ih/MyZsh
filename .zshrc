@@ -17,7 +17,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME=""
+ZSH_THEME="robbyrussell"
 # Powerlevel10k "instant prompt" uyarısını (fastfetch nedeniyle) gizle
 #typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
@@ -87,10 +87,14 @@ plugins=(
   docker-compose
   archlinux
   conda
+  zsh-autosuggestions
+  zsh-history-substring-search
+  zsh-completions
+  zsh-syntax-highlighting
 )
 
 source $ZSH/oh-my-zsh.sh
-source /usr/share/cachyos-zsh-config/cachyos-config.zsh
+#source /usr/share/cachyos-zsh-config/cachyos-config.zsh
 
 # User configuration
 
@@ -203,9 +207,9 @@ alias bd='cd "$OLDPWD"' # Fish'teki '$dirprev' yerine Bash'te '$OLDPWD' kullanı
 alias rmd='/bin/rm --recursive --force --verbose'
 
 # eza (ls alternatifi) için alias'lar
-alias ls='eza -la --icons --git --header'
+alias ls='eza -l --icons --git --header'
 alias l='eza --icons --git'
-alias ll='eza -l --icons --git --header'
+alias ll='eza -la --icons --git --header'
 alias la='eza -la --icons --git --header'
 alias l.='eza -laD --icons --git --header'
 alias lt='eza -la --sort=modified --reverse --icons --git --header'
@@ -470,6 +474,14 @@ function chpwd() {
 # Ctrl+f için 'zi' ataması
 bindkey '^f' 'zi\n'
 
+# zsh-history-substring-search tuş atamaları
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
+# Veya bazı terminaller için alternatif kodlar (Garanti olsun diye ikisini de ekleyebilirsin)
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
+
 # Zoxide'ı başlat
 # ZSH -> Bash versiyonu yerine Zsh versiyonunu kullanıyoruz.
 eval "$(zoxide init zsh)"
@@ -477,3 +489,4 @@ eval "$(zoxide init zsh)"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
