@@ -264,6 +264,19 @@ if command -v bat &>/dev/null; then
   alias cat='bat'
 fi
 
+#Paru alias
+
+# Temel Komut
+alias p="paru"
+# Güncelleme
+alias pup="paru -Syu"
+# Kurulum
+alias pin="paru -S"
+# Silme (En temiz silme yöntemi)
+alias prm="paru -Rns"
+# Arama
+alias pse="paru -Ss"
+
 #######################################################
 # FONKSİYONLAR
 #######################################################
