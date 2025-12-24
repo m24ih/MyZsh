@@ -259,6 +259,25 @@ alias docker-clean='docker container prune -f; docker image prune -f; docker net
 alias hug="systemctl --user restart hugo"
 alias lanm="systemctl --user restart lan-mouse"
 
+
+# Temel Komut
+alias p="paru"
+
+# Güncelleme
+alias pup="paru -Syu"
+
+# Kurulum
+alias pin="paru -S"
+
+# Silme (En temiz silme yöntemi)
+alias prm="paru -Rns"
+
+# Arama
+alias pse="paru -Ss"
+
+alias paruf="paru -Slq | fzf --multi --preview 'paru -Sii {1} --color always' --preview-window=down:75% --ansi | xargs -ro paru -S"
+
+
 # cat'i bat olarak kullanmak için (eğer yüklüyse)
 if command -v bat &>/dev/null; then
   alias cat='bat'
@@ -425,26 +444,6 @@ function ver {
   esac
 }
 
-# Gerekli destek dosyalarını kur
-function install_bashrc_support {
-  local dtype
-  dtype=$(distribution)
-  local FASTFETCH_URL
-  case "$dtype" in
-  redhat) sudo yum install multitail tree zoxide trash-cli fzf fastfetch ;;
-  suse) sudo zypper install multitail tree zoxide trash-cli fzf fastfetch ;;
-  debian)
-    sudo apt-get install multitail tree zoxide trash-cli fzf
-    FASTFETCH_URL=$(curl -s https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest | grep "browser_download_url.*linux-amd64.deb" | cut -d '"' -f 4)
-    curl -sL "$FASTFETCH_URL" -o /tmp/fastfetch_latest_amd64.deb
-    sudo apt-get install /tmp/fastfetch_latest_amd64.deb
-    ;;
-  arch) sudo paru -S multitail tree zoxide trash-cli fzf fastfetch ;;
-  slackware) echo "Slackware için kurulum desteği yok" ;;
-  *) echo "Bilinmeyen dağıtım" ;;
-  esac
-}
-
 # IP adresi bulma
 alias whatismyip='whatsmyip'
 function whatsmyip {
@@ -494,6 +493,8 @@ bindkey '^[[B' history-substring-search-down
 # Veya bazı terminaller için alternatif kodlar (Garanti olsun diye ikisini de ekleyebilirsin)
 bindkey "$terminfo[kcuu1]" history-substring-search-up
 bindkey "$terminfo[kcud1]" history-substring-search-down
+
+source ~/.config/zshrc.d/dots-hyprland.zsh
 
 # Zoxide'ı başlat
 # ZSH -> Bash versiyonu yerine Zsh versiyonunu kullanıyoruz.
