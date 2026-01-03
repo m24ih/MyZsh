@@ -50,6 +50,7 @@ PLUGINS=(
   ["zsh-syntax-highlighting"]="https://github.com/zsh-users/zsh-syntax-highlighting.git"
   ["zsh-completions"]="https://github.com/zsh-users/zsh-completions"
   ["zsh-history-substring-search"]="https://github.com/zsh-users/zsh-history-substring-search"
+  ["zsh-autopair"]="https://github.com/hlissner/zsh-autopair"
 )
 
 for plugin in "${!PLUGINS[@]}"; do

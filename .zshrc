@@ -1,11 +1,12 @@
+source ~/.config/zshrc.d/dots-hyprland.zsh
 fastfetch
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+#if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+#  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+#fi
 
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
@@ -17,7 +18,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+# ZSH_THEME="robbyrussell"
 # Powerlevel10k "instant prompt" uyarısını (fastfetch nedeniyle) gizle
 #typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
@@ -90,9 +91,11 @@ plugins=(
   zsh-autosuggestions
   zsh-history-substring-search
   zsh-completions
+  zsh-autopair
   zsh-syntax-highlighting
 )
 
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 source $ZSH/oh-my-zsh.sh
 #source /usr/share/cachyos-zsh-config/cachyos-config.zsh
 
@@ -145,11 +148,30 @@ export LINUXTOOLBOXDIR="$HOME/linuxtoolbox"
 export EDITOR="nvim"
 export VISUAL="nvim"
 
+# --- Android SDK Ayarları ---
+export ANDROID_HOME="/opt/android-sdk"
+# ANDROID_SDK_ROOT artık gerekli değil, ANDROID_HOME yeterli.
+export ANDROID_AVD_HOME="$HOME/.android/avd"
+
+# --- Java Ayarı ---
+export JAVA_HOME='/usr/lib/jvm/java-25-openjdk'
+
+# --- Flutter ve Dart ---
+export FLUTTER_HOME="/opt/flutter"
+export PUB_CACHE="$HOME/.pub-cache"
+
+# --- PATH Tanımlamaları (Tek seferde ve temiz) ---
+# Önce mevcut path'i, sonra yeni yolları ekle
+export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator:$FLUTTER_HOME/bin:$PUB_CACHE/bin"
+
+# tools/bin artık cmdline-tools içinde olduğu için çoğu zaman gereksizdir, 
+# ama eski paketler için tutulabilir.
+export PATH="$PATH:$ANDROID_HOME/tools/bin"
+
 # --- PATH Yönetimi ---
 # ZSH -> 'add_to_path' fonksiyonları yerine Zsh'in
 # ZSH -> $path dizisini kullanıyoruz. Bu, yinelenen kayıtları otomatik engeller.
 path=(
-  "/home/melih/FlutterEnv/flutter/bin" # Başa eklendi
   $path                                # Mevcut PATH
   "$HOME/.local/bin"                   # Sona eklendi
   "$HOME/.cargo/bin"
@@ -494,7 +516,6 @@ bindkey '^[[B' history-substring-search-down
 bindkey "$terminfo[kcuu1]" history-substring-search-up
 bindkey "$terminfo[kcud1]" history-substring-search-down
 
-source ~/.config/zshrc.d/dots-hyprland.zsh
 
 # Zoxide'ı başlat
 # ZSH -> Bash versiyonu yerine Zsh versiyonunu kullanıyoruz.
@@ -503,4 +524,3 @@ eval "$(zoxide init zsh)"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
