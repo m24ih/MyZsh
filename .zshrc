@@ -1,6 +1,4 @@
-source ~/.config/zshrc.d/dots-hyprland.zsh
 fastfetch
-
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -14,74 +12,6 @@ export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time Oh My Zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# ZSH_THEME="robbyrussell"
-# Powerlevel10k "instant prompt" uyarısını (fastfetch nedeniyle) gizle
-#typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
-
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
   docker
@@ -99,41 +29,10 @@ source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 source $ZSH/oh-my-zsh.sh
 #source /usr/share/cachyos-zsh-config/cachyos-config.zsh
 
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='nvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
-
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
-
 # ---------------------------------------------------------------------------
 # ZSH -> KULLANICIYA ÖZEL AYARLAMALAR (OMZ'den SONRA)
 # ---------------------------------------------------------------------------
 
-# ZSH -> Conda [cite: 1] için eski bloğunuzu silin.
 # ZSH -> BU AYARI ETKİNLEŞTİRMEK İÇİN TERMİNALDE BİR KEZ 'conda init zsh' YAZIN.
 # ZSH -> Bu komut, aşağıya otomatik olarak doğru Zsh kodunu ekleyecektir.
 # <<< conda initialize (ZSH tarafından yönetilecek) >>>
@@ -150,7 +49,6 @@ export VISUAL="nvim"
 
 # --- Android SDK Ayarları ---
 export ANDROID_HOME="/opt/android-sdk"
-# ANDROID_SDK_ROOT artık gerekli değil, ANDROID_HOME yeterli.
 export ANDROID_AVD_HOME="$HOME/.android/avd"
 
 # --- Java Ayarı ---
@@ -160,23 +58,20 @@ export JAVA_HOME='/usr/lib/jvm/java-25-openjdk'
 export FLUTTER_HOME="/opt/flutter"
 export PUB_CACHE="$HOME/.pub-cache"
 
-# --- PATH Tanımlamaları (Tek seferde ve temiz) ---
-# Önce mevcut path'i, sonra yeni yolları ekle
-export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator:$FLUTTER_HOME/bin:$PUB_CACHE/bin"
-
-# tools/bin artık cmdline-tools içinde olduğu için çoğu zaman gereksizdir, 
-# ama eski paketler için tutulabilir.
-export PATH="$PATH:$ANDROID_HOME/tools/bin"
-
 # --- PATH Yönetimi ---
-# ZSH -> 'add_to_path' fonksiyonları yerine Zsh'in
-# ZSH -> $path dizisini kullanıyoruz. Bu, yinelenen kayıtları otomatik engeller.
 path=(
   $path                                # Mevcut PATH
   "$HOME/.local/bin"                   # Sona eklendi
   "$HOME/.cargo/bin"
   "/var/lib/flatpak/exports/bin"
   "$HOME/.local/share/flatpak/exports/bin"
+  "$HOME/anaconda3/bin"
+  "$FLUTTER_HOME/bin"
+  "$PUB_CACHE/bin"
+  "$ANDROID_HOME/platform-tools"
+  "$ANDROID_HOME/cmdline-tools/latest/bin"
+  "$ANDROID_HOME/emulator"
+  "$ANDROID_HOME/tools/bin"
 )
 export PATH
 
@@ -187,15 +82,7 @@ alias vim='nvim'
 alias vi='nvim'
 alias svi='sudo nvim'
 alias vis='nvim "+set si"'
-
-# grep için ripgrep (rg) kontrolü
-if command -v rg &>/dev/null; then
-  alias grep='rg'
-else
-  alias grep='/usr/bin/grep --color=auto'
-fi
-
-# ZSH -> 'ebashc' alias'ını yeni dosyamız için 'ezshc' olarak güncelledim.
+alias grep='rg'
 alias ezshc='nvim ~/.zshrc'
 alias ebashc='nvim ~/.bashrc' # Eskisini de isterseniz tutabilirsiniz
 
@@ -281,32 +168,9 @@ alias docker-clean='docker container prune -f; docker image prune -f; docker net
 alias hug="systemctl --user restart hugo"
 alias lanm="systemctl --user restart lan-mouse"
 
-
-# Temel Komut
-alias p="paru"
-
-# Güncelleme
-alias pup="paru -Syu"
-
-# Kurulum
-alias pin="paru -S"
-
-# Silme (En temiz silme yöntemi)
-alias prm="paru -Rns"
-
-# Arama
-alias pse="paru -Ss"
-
-alias paruf="paru -Slq | fzf --multi --preview 'paru -Sii {1} --color always' --preview-window=down:75% --ansi | xargs -ro paru -S"
-
-
-# cat'i bat olarak kullanmak için (eğer yüklüyse)
-if command -v bat &>/dev/null; then
-  alias cat='bat'
-fi
+alias cat='bat'
 
 #Paru alias
-
 # Temel Komut
 alias p="paru"
 # Güncelleme
@@ -317,6 +181,8 @@ alias pin="paru -S"
 alias prm="paru -Rns"
 # Arama
 alias pse="paru -Ss"
+# Interaktif arama
+alias paruf="paru -Slq | fzf --multi --preview 'paru -Sii {1} --color always' --preview-window=down:75% --ansi | xargs -ro paru -S"
 
 #######################################################
 # FONKSİYONLAR
@@ -408,64 +274,6 @@ function pwdtail {
   pwd | awk -F/ '{nlast = NF -1;print $nlast"/"$NF}'
 }
 
-# Linux dağıtımını bul
-function distribution {
-  local dtype="unknown"
-  if [ -r /etc/os-release ]; then
-    . /etc/os-release
-    case "$ID" in
-    fedora | rhel | centos) dtype="redhat" ;;
-    sles | "opensuse"*) dtype="suse" ;;
-    ubuntu | debian) dtype="debian" ;;
-    gentoo) dtype="gentoo" ;;
-    arch | manjaro) dtype="arch" ;;
-    slackware) dtype="slackware" ;;
-    *)
-      if [ -n "$ID_LIKE" ]; then
-        case "$ID_LIKE" in
-        *fedora* | *rhel* | *centos*) dtype="redhat" ;;
-        *sles* | *opensuse*) dtype="suse" ;;
-        *ubuntu* | *debian*) dtype="debian" ;;
-        *gentoo*) dtype="gentoo" ;;
-        *arch*) dtype="arch" ;;
-        *slackware*) dtype="slackware" ;;
-        esac
-      fi
-      ;;
-    esac
-  fi
-  echo "$dtype"
-}
-
-# İşletim sistemi versiyonunu göster
-function ver {
-  local dtype
-  dtype=$(distribution)
-  case "$dtype" in
-  redhat)
-    if [ -s /etc/redhat-release ]; then
-      cat /etc/redhat-release
-    else
-      cat /etc/issue
-    fi
-    uname -a
-    ;;
-  suse) cat /etc/SuSE-release ;;
-  debian) lsb_release -a ;;
-  gentoo) cat /GENTOO-RELEASE ;;
-  arch) cat /etc/os-release ;;
-  slackware) cat /etc/slackware-version ;;
-  *)
-    if [ -s /etc/issue ]; then
-      cat /etc/issue
-    else
-      echo "Hata: Bilinmeyen dağıtım"
-      return 1
-    fi
-    ;;
-  esac
-}
-
 # IP adresi bulma
 alias whatismyip='whatsmyip'
 function whatsmyip {
@@ -492,14 +300,6 @@ function lazyg {
   git push
 }
 
-#######################################################
-# SON AYARLAMALAR VE ENTEGRASYONLAR
-#######################################################
-
-# ZSH -> 'cd', 'z' ve 'zi' fonksiyonlarınızın yerine
-# ZSH -> Zsh'in 'chpwd' kancasını kullanıyoruz.
-# ZSH -> Bu tek fonksiyon, herhangi bir şekilde (cd, z, zi, ...) dizin
-# ZSH -> değiştirdiğinizde tetiklenir ve 'ls' (yani 'eza' alias'ı) çalıştırır.
 function chpwd() {
   ls
 }
