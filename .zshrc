@@ -101,7 +101,6 @@ alias cls='clear'
 alias apt-get='sudo apt-get'
 alias multitail='multitail --no-repeat -c'
 alias freshclam='sudo freshclam'
-alias yayf="yay -Slq | fzf --multi --preview 'yay -Sii {1}' --preview-window=down:75% | xargs -ro yay -S"
 
 # Dizin değiştirme alias'ları
 alias home='cd ~'
@@ -170,7 +169,7 @@ alias lanm="systemctl --user restart lan-mouse"
 
 alias cat='bat'
 
-#Paru alias
+# Paru alias
 # Temel Komut
 alias p="paru"
 # Güncelleme
@@ -183,6 +182,21 @@ alias prm="paru -Rns"
 alias pse="paru -Ss"
 # Interaktif arama
 alias paruf="paru -Slq | fzf --multi --preview 'paru -Sii {1} --color always' --preview-window=down:75% --ansi | xargs -ro paru -S"
+
+# Yay alias
+# Temel Komut
+alias y="yay"
+# Güncelleme
+alias yup="yay -Syu"
+# Kurulum
+alias yin="yay -S"
+# Silme (En temiz silme yöntemi)
+alias yrm="yay -Rns"
+# Arama
+alias yse="yay -Ss"
+# Interaktif arama
+alias yayf="yay -Slq | fzf --multi --preview 'yay -Sii {1}' --preview-window=down:75% | xargs -ro yay -S"
+
 
 #######################################################
 # FONKSİYONLAR
