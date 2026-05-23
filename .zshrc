@@ -12,6 +12,10 @@ export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
+# Proton Pass
+export SSH_AUTH_SOCK="$HOME/.ssh/proton-pass-agent.sock"
+export PROTON_PASS_LINUX_KEYRING=dbus
+
 plugins=(
   git
   docker
@@ -36,6 +40,10 @@ source $ZSH/oh-my-zsh.sh
 # ZSH -> BU AYARI ETKİNLEŞTİRMEK İÇİN TERMİNALDE BİR KEZ 'conda init zsh' YAZIN.
 # ZSH -> Bu komut, aşağıya otomatik olarak doğru Zsh kodunu ekleyecektir.
 # <<< conda initialize (ZSH tarafından yönetilecek) >>>
+
+
+ENABLE_CORRECTION="true"
+setopt correct_all
 
 # --- Değişken Tanımlamaları ---
 export CHROME_EXECUTABLE="/usr/bin/google-chrome-stable"
@@ -85,6 +93,8 @@ alias vis='nvim "+set si"'
 alias grep='rg'
 alias ezshc='nvim ~/.zshrc'
 alias ebashc='nvim ~/.bashrc' # Eskisini de isterseniz tutabilirsiniz
+
+alias btop="sudo -E btop"
 
 # Tarih alias'ı
 alias da='date "+%Y-%m-%d %A %T %Z"'
@@ -196,6 +206,11 @@ alias yrm="yay -Rns"
 alias yse="yay -Ss"
 # Interaktif arama
 alias yayf="yay -Slq | fzf --multi --preview 'yay -Sii {1}' --preview-window=down:75% | xargs -ro yay -S"
+
+
+# Envycontrol
+alias integrated="sudo envycontrol -s integrated --verbose"
+alias hybrid="sudo envycontrol -s hybrid --verbose"
 
 
 #######################################################
