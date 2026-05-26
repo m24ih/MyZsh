@@ -29,8 +29,10 @@ plugins=(
   zsh-syntax-highlighting
 )
 
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+# source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 source $ZSH/oh-my-zsh.sh
+eval "$(starship init zsh)"
+# eval "$(oh-my-posh init zsh)"
 #source /usr/share/cachyos-zsh-config/cachyos-config.zsh
 
 # ---------------------------------------------------------------------------
@@ -351,5 +353,9 @@ bindkey "$terminfo[kcud1]" history-substring-search-down
 eval "$(zoxide init zsh)"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/melih/.local/bin:$PATH"
