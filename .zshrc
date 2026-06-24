@@ -35,6 +35,9 @@ eval "$(starship init zsh)"
 # eval "$(oh-my-posh init zsh)"
 #source /usr/share/cachyos-zsh-config/cachyos-config.zsh
 
+#Fzf source 
+source /usr/share/fzf/
+
 # ---------------------------------------------------------------------------
 # ZSH -> KULLANICIYA ÖZEL AYARLAMALAR (OMZ'den SONRA)
 # ---------------------------------------------------------------------------
