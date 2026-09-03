@@ -1,27 +1,142 @@
-fastfetch
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-#if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-#  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-#fi
+# =============================================================================
+# Zsh Configuration
+# =============================================================================
 
-# If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+# --- Fastfetch & Logo Yönetimi ---
+__update_fastfetch_logo() {
+  local logo_dir="$HOME/.config/fastfetch/logo"
+  [[ -d "$logo_dir" ]] || return
+  [[ -f /etc/os-release ]] || return
 
-# Path to your Oh My Zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+  # /etc/os-release dosyasından ID, ID_LIKE ve LOGO değerlerini oku
+  local os_id os_like os_logo
+  os_id=$(grep -E "^ID=" /etc/os-release 2>/dev/null | head -n 1 | sed -E 's/^ID=//; s/["'\'' ]//g' | tr '[:upper:]' '[:lower:]')
+  os_like=$(grep -E "^ID_LIKE=" /etc/os-release 2>/dev/null | head -n 1 | sed -E 's/^ID_LIKE=//; s/["'\'' ]//g' | tr '[:upper:]' '[:lower:]')
+  os_logo=$(grep -E "^LOGO=" /etc/os-release 2>/dev/null | head -n 1 | sed -E 's/^LOGO=//; s/["'\'' ]//g' | tr '[:upper:]' '[:lower:]')
 
-# Proton Pass
-export SSH_AUTH_SOCK="$HOME/.ssh/proton-pass-agent.sock"
+  local -a candidates
+  [[ -n "$os_id" ]] && candidates+=("$os_id")
+  if [[ -n "$os_like" ]]; then
+    for item in ${(s: :)os_like}; do
+      candidates+=("$item")
+    done
+  fi
+  [[ -n "$os_logo" ]] && candidates+=("$os_logo")
+
+  local found_logo=""
+  for cand in "${candidates[@]}"; do
+    [[ -z "$cand" ]] && continue
+
+    # 1. Standart kalıp eşleştirmeleri: cand-logo.png, cand.png, cand_logo.png
+    for pattern in "${cand}-logo.png" "${cand}.png" "${cand}_logo.png" "$cand"; do
+      for file in "$logo_dir"/*(N); do
+        local fname="${file:t}"
+        [[ "$fname" == "os-logo.png" ]] && continue
+        if [[ "${fname:l}" == "${pattern:l}" ]]; then
+          found_logo="$file"
+          break 2
+        fi
+      done
+    done
+    [[ -n "$found_logo" ]] && break
+
+    # 2. Alt dize eşleşmesi
+    for file in "$logo_dir"/*(N); do
+      local fname="${file:t}"
+      [[ "$fname" == "os-logo.png" ]] && continue
+      if [[ "${fname:l}" == *"${cand:l}"* ]]; then
+        found_logo="$file"
+        break 2
+      fi
+    done
+  done
+
+  if [[ -n "$found_logo" && -f "$found_logo" ]]; then
+    local current_target desired_target rel_target
+    current_target=$(realpath "$logo_dir/os-logo.png" 2>/dev/null)
+    desired_target=$(realpath "$found_logo" 2>/dev/null)
+    if [[ "$current_target" != "$desired_target" ]]; then
+      rel_target="${found_logo:t}"
+      ln -sf "$rel_target" "$logo_dir/os-logo.png"
+    fi
+  fi
+}
+
+fastfetch() {
+  __update_fastfetch_logo
+  command fastfetch "$@"
+}
+
+# =============================================================================
+# ENVIRONMENT VARIABLES (ORTAM DEĞİŞKENLERİ)
+# =============================================================================
+
+# XDG Base Directory
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_STATE_HOME="$HOME/.local/state"
+export XDG_CACHE_HOME="$HOME/.cache"
+export LINUXTOOLBOXDIR="$HOME/linuxtoolbox"
+
+# Editör ve Sayfalayıcı
+export EDITOR="nvim"
+export VISUAL="nvim"
+export MANROFFOPT="-c"
+if command -v bat &>/dev/null; then
+  export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+fi
+
+# Geliştirme Ortamları
+export ANDROID_HOME="/opt/android-sdk"
+export ANDROID_AVD_HOME="$HOME/.android/avd"
+export JAVA_HOME="/usr/lib/jvm/java-25-openjdk"
+export FLUTTER_HOME="/opt/flutter"
+export PUB_CACHE="$HOME/.pub-cache"
+export CHROME_EXECUTABLE="/usr/bin/google-chrome-stable"
+
+# Proton Pass Entegrasyonu
+export SSH_AUTH_SOCK="$HOME/.ssh/proton-pass-ssh-agent.sock"
 export PROTON_PASS_LINUX_KEYRING=dbus
+export PROTON_PASS_KEY_PROVIDER=fs
+
+if [[ -o interactive ]] && command -v dbus-update-activation-environment &>/dev/null; then
+  dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP GNOME_KEYRING_CONTROL SSH_AUTH_SOCK PROTON_PASS_KEY_PROVIDER 2>/dev/null
+fi
+
+# =============================================================================
+# PATH YÖNETİMİ
+# =============================================================================
+
+typeset -U path
+path=(
+  "$HOME/bin"
+  "$HOME/.local/bin"
+  "$HOME/.grok/bin"
+  "$HOME/.npm-global/bin"
+  "$HOME/.cargo/bin"
+  "/var/lib/flatpak/exports/bin"
+  "$HOME/.local/share/flatpak/exports/bin"
+  "$FLUTTER_HOME/bin"
+  "$PUB_CACHE/bin"
+  "$ANDROID_HOME/platform-tools"
+  "$ANDROID_HOME/cmdline-tools/latest/bin"
+  "$ANDROID_HOME/emulator"
+  "$ANDROID_HOME/tools/bin"
+  $path
+)
+export PATH
+
+# =============================================================================
+# OH MY ZSH & EKLENTİLER
+# =============================================================================
+
+export ZSH="$HOME/.oh-my-zsh"
 
 plugins=(
   git
   docker
   docker-compose
   archlinux
-  conda
   zsh-autosuggestions
   zsh-history-substring-search
   zsh-completions
@@ -29,85 +144,89 @@ plugins=(
   zsh-syntax-highlighting
 )
 
-# source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-source $ZSH/oh-my-zsh.sh
-eval "$(starship init zsh)"
-# eval "$(oh-my-posh init zsh)"
-#source /usr/share/cachyos-zsh-config/cachyos-config.zsh
+[[ -f "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
 
-#Fzf source 
-source /usr/share/fzf/
+# =============================================================================
+# ETKİLEŞİMLİ KABUK ENTEGRASYONLARI
+# =============================================================================
 
-# ---------------------------------------------------------------------------
-# ZSH -> KULLANICIYA ÖZEL AYARLAMALAR (OMZ'den SONRA)
-# ---------------------------------------------------------------------------
+if [[ -o interactive ]]; then
+  # Akış kontrolünü kapat (Ctrl+S/Q kilitlenmelerini önler)
+  stty -ixon 2>/dev/null
 
-# ZSH -> BU AYARI ETKİNLEŞTİRMEK İÇİN TERMİNALDE BİR KEZ 'conda init zsh' YAZIN.
-# ZSH -> Bu komut, aşağıya otomatik olarak doğru Zsh kodunu ekleyecektir.
-# <<< conda initialize (ZSH tarafından yönetilecek) >>>
+  # FZF Kaynakları
+  [[ -f /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
+  [[ -f /usr/share/fzf/completion.zsh ]] && source /usr/share/fzf/completion.zsh
 
+  # Quickshell Terminal Renk Dizileri
+  if [[ -f "$HOME/.local/state/quickshell/user/generated/terminal/sequences.txt" ]]; then
+    cat "$HOME/.local/state/quickshell/user/generated/terminal/sequences.txt"
+  fi
+
+  # Starship & Zoxide
+  if command -v starship &>/dev/null; then
+    eval "$(starship init zsh)"
+  fi
+  if command -v zoxide &>/dev/null; then
+    eval "$(zoxide init zsh)"
+  fi
+
+  # Başlangıç Karşılaması (Fastfetch)
+  if command -v fastfetch &>/dev/null; then
+    fastfetch
+  fi
+fi
+
+# =============================================================================
+# CONDA (LAZY LOAD - TEMBEL YÜKLEME)
+# =============================================================================
+
+__conda_setup() {
+  if [[ -f "/home/melih/anaconda3/bin/conda" ]]; then
+    eval "$('/home/melih/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+  fi
+}
+
+conda() {
+  unfunction conda
+  __conda_setup
+  conda "$@"
+}
 
 ENABLE_CORRECTION="true"
 setopt correct_all
 
-# --- Değişken Tanımlamaları ---
-export CHROME_EXECUTABLE="/usr/bin/google-chrome-stable"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_STATE_HOME="$HOME/.local/state"
-export XDG_CACHE_HOME="$HOME/.cache"
-export LINUXTOOLBOXDIR="$HOME/linuxtoolbox"
-export EDITOR="nvim"
-export VISUAL="nvim"
+# =============================================================================
+# ALIAS (KISAYOL) TANIMLAMALARI
+# =============================================================================
 
-# --- Android SDK Ayarları ---
-export ANDROID_HOME="/opt/android-sdk"
-export ANDROID_AVD_HOME="$HOME/.android/avd"
-
-# --- Java Ayarı ---
-export JAVA_HOME='/usr/lib/jvm/java-25-openjdk'
-
-# --- Flutter ve Dart ---
-export FLUTTER_HOME="/opt/flutter"
-export PUB_CACHE="$HOME/.pub-cache"
-
-# --- PATH Yönetimi ---
-path=(
-  $path                                # Mevcut PATH
-  "$HOME/.local/bin"                   # Sona eklendi
-  "$HOME/.cargo/bin"
-  "/var/lib/flatpak/exports/bin"
-  "$HOME/.local/share/flatpak/exports/bin"
-  "$HOME/anaconda3/bin"
-  "$FLUTTER_HOME/bin"
-  "$PUB_CACHE/bin"
-  "$ANDROID_HOME/platform-tools"
-  "$ANDROID_HOME/cmdline-tools/latest/bin"
-  "$ANDROID_HOME/emulator"
-  "$ANDROID_HOME/tools/bin"
-)
-export PATH
-
-# --- Alias (Kısayol) Tanımlamaları ---
+# Editör Kısayolları
 alias spico='sudo pico'
 alias snano='sudo nano'
 alias vim='nvim'
 alias vi='nvim'
 alias svi='sudo nvim'
 alias vis='nvim "+set si"'
-alias grep='rg'
 alias ezshc='nvim ~/.zshrc'
-alias ebashc='nvim ~/.bashrc' # Eskisini de isterseniz tutabilirsiniz
+alias efishc='nvim ~/.config/fish/config.fish'
+alias ebashc='nvim ~/.bashrc'
 
-alias btop="sudo -E btop"
+# Arama Araçları
+if command -v rg &>/dev/null; then
+  alias grep='rg'
+else
+  alias grep='/usr/bin/grep --color=auto'
+fi
 
-# Tarih alias'ı
+if command -v bat &>/dev/null; then
+  alias cat='bat'
+fi
+
+# Temel Sistem Komutları
 alias da='date "+%Y-%m-%d %A %T %Z"'
-
-# Değiştirilmiş komutlar
 alias cp='cp -i'
 alias mv='mv -i'
-alias rm='trash -v' # Çöp kutusuna taşı
+alias rm='trash -v'
 alias mkdir='mkdir -p'
 alias ps='ps auxf'
 alias ping='ping -c 10'
@@ -116,20 +235,19 @@ alias cls='clear'
 alias apt-get='sudo apt-get'
 alias multitail='multitail --no-repeat -c'
 alias freshclam='sudo freshclam'
+alias btop='sudo -E btop'
 
-# Dizin değiştirme alias'ları
+# Dizin Gezinme
 alias home='cd ~'
 alias cd..='cd ..'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
-alias bd='cd "$OLDPWD"' # Fish'teki '$dirprev' yerine Bash'te '$OLDPWD' kullanılır
+alias bd='cd "$OLDPWD"'
 
-# Dizin ve içeriğini sil (rm alias'ını bypass eder)
+# Dosya Yönetimi & eza
 alias rmd='/bin/rm --recursive --force --verbose'
-
-# eza (ls alternatifi) için alias'lar
 alias ls='eza -l --icons --git --header'
 alias l='eza --icons --git'
 alias ll='eza -la --icons --git --header'
@@ -143,7 +261,7 @@ alias Ta='eza --tree --level=3 -a --icons --git'
 alias lf='eza -l --icons --git --no-dir'
 alias ldir='eza -lD --icons --git'
 
-# chmod alias'ları
+# İzinler
 alias mx='chmod a+x'
 alias 000='chmod -R 000'
 alias 644='chmod -R 644'
@@ -151,23 +269,29 @@ alias 666='chmod -R 666'
 alias 755='chmod -R 755'
 alias 777='chmod -R 777'
 
-# Arama alias'ları
+# Arama ve Sistem Bilgisi
 alias h='history | grep'
-alias p="ps aux | grep"
+alias p='ps aux | grep'
 alias topcpu="/bin/ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10"
 alias f="find . | grep"
-
-# Diğer alias'lar
 alias checkcommand="type -t"
 alias openports='netstat -nape --inet'
-alias rebootsafe='sudo shutdown -r now'
-alias rebootforce='sudo shutdown -r -n now'
 alias diskspace="du -S | sort -n -r | more"
 alias folders='du -h --max-depth=1'
 alias folderssort='find . -maxdepth 1 -type d -print0 | xargs -0 du -sk | sort -rn'
 alias tree='tree -CAhF --dirsfirst'
 alias treed='tree -CAFd'
 alias mountedinfo='df -hT'
+
+# Rclone Yönetimi
+alias rclone-status='rclone rc core/stats --url localhost:5572'
+alias rclone-vfs='rclone rc vfs/stats --url localhost:5572'
+alias rclone-queue='rclone rc vfs/queue --url localhost:5572'
+alias watch-rclone='watch -n 1 -c "rclone rc core/stats --url localhost:5572 | jq -C ."'
+alias watch-rclone-queue='watch -n 1 -c "rclone rc vfs/queue --url localhost:5572 | jq -C ."'
+alias watch-rclone-all='watch -n 1 -c "zsh -c rclone-all"'
+
+# Arşivler
 alias mktar='tar -cvf'
 alias mkbz2='tar -cvjf'
 alias mkgz='tar -cvzf'
@@ -175,68 +299,94 @@ alias untar='tar -xvf'
 alias unbz2='tar -xvjf'
 alias ungz='tar -xvzf'
 alias sha1='openssl sha1'
-#alias logs="sudo find /var/log -type f -exec file {} \; | grep 'text' | cut -d' ' -f1 | sed -e's/:$//g' | grep -v '[0-9]\$' | xargs tail -f"
+
+# Donanım ve Servisler
+alias rebootsafe='sudo shutdown -r now'
+alias rebootforce='sudo shutdown -r -n now'
 alias clickpaste='sleep 3; xdotool type "$(xclip -o -selection clipboard)"'
 alias kssh="kitty +kitten ssh"
 alias docker-clean='docker container prune -f; docker image prune -f; docker network prune -f; docker volume prune -f'
 alias hug="systemctl --user restart hugo"
 alias lanm="systemctl --user restart lan-mouse"
-
-alias cat='bat'
-
-# Paru alias
-# Temel Komut
-alias p="paru"
-# Güncelleme
-alias pup="paru -Syu"
-# Kurulum
-alias pin="paru -S"
-# Silme (En temiz silme yöntemi)
-alias prm="paru -Rns"
-# Arama
-alias pse="paru -Ss"
-# Interaktif arama
-alias paruf="paru -Slq | fzf --multi --preview 'paru -Sii {1} --color always' --preview-window=down:75% --ansi | xargs -ro paru -S"
-
-# Yay alias
-# Temel Komut
-alias y="yay"
-# Güncelleme
-alias yup="yay -Syu"
-# Kurulum
-alias yin="yay -S"
-# Silme (En temiz silme yöntemi)
-alias yrm="yay -Rns"
-# Arama
-alias yse="yay -Ss"
-# Interaktif arama
-alias yayf="yay -Slq | fzf --multi --preview 'yay -Sii {1}' --preview-window=down:75% | xargs -ro yay -S"
-
-
-# Envycontrol
+alias logs="sudo find /var/log -type f -exec file {} + | grep 'text' | cut -d: -f1 | xargs tail -f"
 alias integrated="sudo envycontrol -s integrated --verbose"
 alias hybrid="sudo envycontrol -s hybrid --verbose"
+alias glorious="mxw report battery"
 
+# Paket Yöneticileri (Paru & Yay)
+alias p="paru"
+alias pup="paru -Syu"
+alias pin="paru -S"
+alias prm="paru -Rns"
+alias pse="paru -Ss"
+alias paruf="paru -Slq | fzf --multi --preview 'paru -Sii {1}' --preview-window=down:75% | xargs -ro paru -S"
+alias parur="paru -Qq | fzf --multi --preview 'paru -Qi {1}' --preview-window=down:75% | xargs -ro paru -Rns"
 
-#######################################################
+alias y="yay"
+alias yup="yay -Syu"
+alias yin="yay -S"
+alias yrm="yay -Rns"
+alias yse="yay -Ss"
+alias yayf="yay -Slq | fzf --multi --preview 'yay -Sii {1}' --preview-window=down:75% | xargs -ro yay -S"
+alias yayr="yay -Qq | fzf --multi --preview 'yay -Qi {1}' --preview-window=down:75% | xargs -ro yay -Rns"
+
+# =============================================================================
 # FONKSİYONLAR
-#######################################################
+# =============================================================================
+
+# Rclone Tüm İstatistikler
+rclone-all() {
+  echo "=== Core Stats ==="
+  rclone rc core/stats --url localhost:5572 | jq -C .
+  echo "=== VFS Queue ==="
+  rclone rc vfs/queue --url localhost:5572 | jq -C .
+}
+
+# Hızlı Yedekleme
+backup() {
+  if [[ -z "$1" ]]; then
+    echo "Kullanım: backup <dosya_adı>"
+    return 1
+  fi
+  cp -r "$1" "$1.bak"
+}
+
+# Akıllı Kopyalama (Klasör algılanırsa -r otomatik)
+copy() {
+  if [[ $# -eq 2 && -d "$1" ]]; then
+    local from="${1%/}"
+    local to="$2"
+    command cp -r "$from" "$to"
+  else
+    command cp "$@"
+  fi
+}
+
+# Dosya, sembolik bağ ve dizin sayılarını listeleme
+countfiles() {
+  for t in f l d; do
+    local name="files"
+    [[ "$t" == "l" ]] && name="links"
+    [[ "$t" == "d" ]] && name="directories"
+    echo "$(find . -type "$t" 2>/dev/null | wc -l) $name"
+  done
+}
 
 # Arşiv çıkarma fonksiyonu
-function extract {
+extract() {
   for archive in "$@"; do
-    if [ -f "$archive" ]; then
+    if [[ -f "$archive" ]]; then
       case "$archive" in
-      *.tar.bz2 | *.tbz2) tar xvjf "$archive" ;;
-      *.tar.gz | *.tgz) tar xvzf "$archive" ;;
-      *.bz2) bunzip2 "$archive" ;;
-      *.rar) unrar x "$archive" ;;
-      *.gz) gunzip "$archive" ;;
-      *.tar) tar xvf "$archive" ;;
-      *.zip) unzip "$archive" ;;
-      *.Z) uncompress "$archive" ;;
-      *.7z) 7z x "$archive" ;;
-      *) echo "Bilinmeyen arşiv türü: '$archive'" ;;
+        *.tar.bz2|*.tbz2) tar xvjf "$archive" ;;
+        *.tar.gz|*.tgz)   tar xvzf "$archive" ;;
+        *.bz2)            bunzip2 "$archive" ;;
+        *.rar)            unrar x "$archive" ;;
+        *.gz)             gunzip "$archive" ;;
+        *.tar)            tar xvf "$archive" ;;
+        *.zip)            unzip "$archive" ;;
+        *.Z)              uncompress "$archive" ;;
+        *.7z)             7z x "$archive" ;;
+        *)                echo "Bilinmeyen arşiv türü: '$archive'" ;;
       esac
     else
       echo "'$archive' geçerli bir dosya değil!"
@@ -245,12 +395,12 @@ function extract {
 }
 
 # Dosya içinde metin arama
-function ftext {
+ftext() {
   grep -iIHrn --color=always "$1" . | less -r
 }
 
 # İlerleme çubuğu ile dosya kopyalama
-function cpp {
+cpp() {
   local total_size
   total_size=$(stat -c '%s' "$1")
   strace -q -ewrite cp -- "$1" "$2" 2>&1 |
@@ -270,8 +420,8 @@ function cpp {
 }
 
 # Kopyala ve o dizine git
-function cpg {
-  if [ -d "$2" ]; then
+cpg() {
+  if [[ -d "$2" ]]; then
     cp "$1" "$2" && cd "$2"
   else
     cp "$1" "$2"
@@ -279,8 +429,8 @@ function cpg {
 }
 
 # Taşı ve o dizine git
-function mvg {
-  if [ -d "$2" ]; then
+mvg() {
+  if [[ -d "$2" ]]; then
     mv "$1" "$2" && cd "$2"
   else
     mv "$1" "$2"
@@ -288,13 +438,12 @@ function mvg {
 }
 
 # Dizin oluştur ve içine gir
-function mkdirg {
+mkdirg() {
   mkdir -p "$1" && cd "$1"
 }
 
 # Belirtilen sayıda yukarı dizine çık
-function up {
-  # ${1:-1} -> $1 varsa onu, yoksa 1'i kullanır
+up() {
   local limit=${1:-1}
   local path=""
   for i in $(seq 1 "$limit"); do
@@ -304,61 +453,135 @@ function up {
 }
 
 # Çalışılan dizinin son iki bölümünü göster
-function pwdtail {
+pwdtail() {
   pwd | awk -F/ '{nlast = NF -1;print $nlast"/"$NF}'
 }
 
 # IP adresi bulma
 alias whatismyip='whatsmyip'
-function whatsmyip {
+whatsmyip() {
   echo -n "Dahili IP: "
+  local local_ip
   if command -v ip &>/dev/null; then
-    ip addr show wlan0 | grep "inet " | awk '{print $2}' | cut -d/ -f1
+    local_ip=$(ip route get 1.1.1.1 2>/dev/null | awk '{print $7; exit}')
+    if [[ -n "$local_ip" ]]; then
+      echo "$local_ip"
+    else
+      ip addr show 2>/dev/null | grep -E "inet .*scope global" | awk '{print $2}' | cut -d/ -f1 | head -n 1
+    fi
+  elif command -v hostname &>/dev/null; then
+    hostname -I 2>/dev/null | awk '{print $1}'
   else
-    ifconfig wlan0 | grep "inet " | awk '{print $2}'
+    echo "Bulunamadı"
   fi
 
   echo -n "Harici IP: "
-  curl -4 ifconfig.me
+  curl -4s ifconfig.me
+  echo ""
 }
 
 # GitHub Fonksiyonları
-function gcom {
+gcom() {
   git add .
   git commit -m "$1"
 }
 
-function lazyg {
+lazyg() {
   git add .
   git commit -m "$1"
   git push
 }
 
-function chpwd() {
-  ls
+# Hastebin Belge Yükleme
+hb() {
+  if [[ $# -eq 0 ]]; then
+    echo "Dosya yolu belirtilmedi."
+    return 1
+  fi
+  if [[ ! -f "$1" ]]; then
+    echo "Dosya yolu mevcut değil."
+    return 1
+  fi
+  local uri="http://bin.christitus.com/documents"
+  local response
+  response=$(curl -s -X POST -d @"$1" "$uri")
+  if [[ $? -eq 0 ]]; then
+    local hasteKey
+    hasteKey=$(echo "$response" | jq -r '.key')
+    echo "http://bin.christitus.com/$hasteKey"
+  else
+    echo "Belge yüklenemedi."
+  fi
 }
 
-# ZSH -> Bash 'bind' komutu Zsh'te 'bindkey' olarak kullanılır.
-# Ctrl+f için 'zi' ataması
-bindkey '^f' 'zi\n'
+# Dizin değişiminde otomatik ls
+chpwd() {
+  if [[ -o interactive ]]; then
+    ls
+  fi
+}
 
-# zsh-history-substring-search tuş atamaları
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
+# =============================================================================
+# TUŞ ATAMALARI (KEY BINDINGS) & VI MODU
+# =============================================================================
 
-# Veya bazı terminaller için alternatif kodlar (Garanti olsun diye ikisini de ekleyebilirsin)
-bindkey "$terminfo[kcuu1]" history-substring-search-up
-bindkey "$terminfo[kcud1]" history-substring-search-down
+# Vi Modunu Etkinleştir
+bindkey -v
 
+# ESC tuşu gecikmesini en aza indir (varsayılan 0.4s çok yavaştır)
+export KEYTIMEOUT=15
 
-# Zoxide'ı başlat
-# ZSH -> Bash versiyonu yerine Zsh versiyonunu kullanıyoruz.
-eval "$(zoxide init zsh)"
+# Visual Mode (Görsel Seçim) ve Vurgulama
+bindkey -M vicmd 'v' visual-mode
+bindkey -M vicmd 'V' visual-line-mode
+zle_highlight=(region:standout)
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# Normal Modda 'vv' ile geçerli komutu Neovim'de ($EDITOR) açıp düzenleme
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd 'vv' edit-command-line
 
+# Hem Normal (vicmd) hem Ekleme (viins) modunda arama ve geçmiş tuşları
+bindkey -M viins '^r' history-incremental-search-backward
+bindkey -M vicmd '^r' history-incremental-search-backward
+bindkey -M viins '^a' beginning-of-line
+bindkey -M viins '^e' end-of-line
+bindkey -M viins '^?' backward-delete-char
+bindkey -M viins '^h' backward-delete-char
+bindkey -M viins '^w' backward-kill-word
 
+# Ctrl+f -> Zoxide Interactive Search
+bindkey -M viins '^f' 'zi\n'
+bindkey -M vicmd '^f' 'zi\n'
+
+# zsh-history-substring-search tuş atamaları (Normal ve Ekleme modu için)
+bindkey -M viins '^[[A' history-substring-search-up
+bindkey -M viins '^[[B' history-substring-search-down
+bindkey -M vicmd '^[[A' history-substring-search-up
+bindkey -M vicmd '^[[B' history-substring-search-down
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+bindkey "$terminfo[kcuu1]" history-substring-search-up 2>/dev/null
+bindkey "$terminfo[kcud1]" history-substring-search-down 2>/dev/null
+
+# Düzenleme Kısayolları
+bindkey '^Z' undo 2>/dev/null
+
+# Vi Moduna göre İmleç Şeklini Değiştir (Normal Mod: Blok [█], Ekleme Modu: Çizgi [|])
+function zle-keymap-select {
+  if [[ ${KEYMAP} == vicmd ]] || [[ $1 = 'block' ]]; then
+    echo -ne '\e[2 q'
+  elif [[ ${KEYMAP} == main ]] || [[ ${KEYMAP} == viins ]] || [[ ${KEYMAP} = '' ]] || [[ $1 = 'beam' ]]; then
+    echo -ne '\e[5 q'
+  fi
+}
+zle -N zle-keymap-select
+_fix_cursor() { echo -ne '\e[5 q'; }
+precmd_functions+=(_fix_cursor)
+
+# =============================================================================
+# DİĞER
+# =============================================================================
 
 # Added by Antigravity CLI installer
 export PATH="/home/melih/.local/bin:$PATH"
